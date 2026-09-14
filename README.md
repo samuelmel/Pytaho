@@ -11,7 +11,7 @@ O **Pytaho** é uma estrutura de engenharia de dados em Python desenhada para su
 | Arquivos XML proprietários (`.ktr` / `.kjb`) difíceis de versionar e fazer merge | **Código Python puro**, versionado diretamente no **Git** com Pull Requests e code review |
 | Execução pesada em máquina virtual Java (JVM) com alto consumo de memória | Motores analíticos compilados em **Rust / C++ (Polars e DuckDB)**, até **50x mais rápidos** |
 | Dificuldade para criar testes automatizados de dados | Testes unitários e de integração com **Pytest** integrados a pipelines de CI/CD |
-| Interface gráfica pesada e engessada | Orquestração moderna como código (*Workflows-as-Code*) com **Prefect** ou **Dagster** |
+| Interface gráfica pesada e engessada | Orquestração moderna como código (*Workflows-as-Code*) com **Prefect**  |
 | Conexões JDBC lentas para grandes volumes | Leitura paralela ultra-rápida direto para a memória com **ConnectorX** e **Arrow** |
 
 ---
