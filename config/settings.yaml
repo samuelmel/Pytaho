@@ -1,0 +1,11 @@
+# Parâmetros de execução e configurações globais
+app:
+  name: "pytaho"
+  version: "0.1.0"
+
+# Mapeamento de tabelas e parâmetros dos pipelines
+pipelines:
+  sales:
+    # Parâmetros do pipeline de vendas
+  hr:
+    # Parâmetros do pipeline de RH
