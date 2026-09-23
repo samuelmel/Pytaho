@@ -34,7 +34,7 @@
    - Utiliza o motor analítico **Polars** no código gerado para processamento de alta performance em memória.
 
 4. **Interface de Linha de Comando (CLI)**:
-   - Transpile seus arquivos do Pentaho em segundos através do terminal:
+   - Transcreva seus arquivos do Pentaho em segundos através do terminal:
 
 ```bash
 pytaho convert sample_pentaho_files/exemplo_oracle.ktr -o pipelines/vendas_oracle.py
@@ -42,7 +42,7 @@ pytaho convert sample_pentaho_files/exemplo_oracle.ktr -o pipelines/vendas_oracl
 
 ---
 
-## 📌 Por que usar o Pytaho?
+## 📌 Por que usar?
 
 * **Zero Lock-in:** Abandone interfaces gráficas pesadas e execute seus pipelines nativamente em containers Docker, Airflow ou GitHub Actions.
 * **Alta Performance:** Substitua o processamento Java do Pentaho pela velocidade nativa do motor em Rust do **Polars**.
@@ -55,7 +55,7 @@ pytaho convert sample_pentaho_files/exemplo_oracle.ktr -o pipelines/vendas_oracl
 
 ### 1. Instalação das Dependências
 
-Recomendamos o uso do [`uv`](https://github.com/astral-sh/uv) pela velocidade, mas você pode utilizar o `pip` tradicional:
+Eu recomendo o uso do [`uv`](https://github.com/astral-sh/uv) pela velocidade, mas você pode utilizar o `pip` tradicional:
 
 ```bash
 # Clone o repositório
@@ -85,7 +85,7 @@ python -m pytaho.cli convert sample_pentaho_files/exemplo_oracle.ktr -o pipeline
 
 ## 💻 Exemplo de Código Gerado (Output POO)
 
-Ao transpilar um `.ktr` com banco **Oracle**, o Pytaho gera automaticamente um script estruturado em POO, totalmente seguro e legível:
+Ao transcrever um `.ktr` com banco **Oracle**, o Pytaho gera automaticamente um script estruturado em POO, totalmente seguro e legível:
 
 ```python
 import os
