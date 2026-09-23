@@ -1,3 +1,5 @@
+🇧🇷 Português | [🇺🇸 English](README_EN.md)
+
 # Pytaho - Pentaho XML to Python OOP Transpiler 🚀
 
 O **Pytaho** é uma ferramenta open-source de **transpilação e geração automática de código Python Orientado a Objetos (POO)** a partir de transformações (`.ktr`) e jobs (`.kjb`) exportados do **Pentaho Data Integration (PDI / Kettle)**.
