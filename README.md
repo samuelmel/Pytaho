@@ -10,7 +10,7 @@
 [![Engine: Polars](https://img.shields.io/badge/Data%20Engine-Polars-CD7F32.svg)](https://pola.rs/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-**Migre seus pipelines legados do Pentaho Data Integration (PDI) para código Python modular, performático e legível em segundos.**
+**Migre seus pipelines legados do Pentaho (PDI) para código Python modular, performático e legível em segundos.**
 
 </div>
 
