@@ -1,7 +1,5 @@
 🇧🇷 Português | [🇺🇸 English](README_EN.md)
 
-# Pytaho 
-
 <div align="center">
 
 # 🚀 Pytaho
