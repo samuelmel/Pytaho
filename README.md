@@ -1,6 +1,6 @@
 🇧🇷 Português | [🇺🇸 English](README_EN.md)
 
-# Pytaho - Pentaho XML to Python OOP Transpiler 🚀
+# Pytaho 
 
 <div align="center">
 
