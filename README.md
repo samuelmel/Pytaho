@@ -196,9 +196,13 @@ pytest -v
 
 ---
 
-## 📄 Licença
 
-Este projeto está sob a licença MIT. Veja o arquivo [LICENSE](LICENSE) para mais detalhes.
+## 👨‍💻 Autor
 
-```
-```
+**Samuel Santos**
+
+O Pytaho foi criado por **Samuel Santos** com o objetivo de facilitar a vida no ambiente corporativo e também servir como projeto de estudo, explorando conceitos de Engenharia de Dados, Python, automação, bancos de dados e modernização de pipelines legados.
+
+---
+
+
