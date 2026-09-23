@@ -1,11 +1,27 @@
 # Parâmetros de execução e configurações globais
 app:
+  name: "Pytaho ETL Engine"
+  version: "1.0.0"
+  log_level: "INFO"
+  timezone: "America/Sao_Paulo"
   name: "pytaho"
   version: "0.1.0"
+
+storage:
+  raw_path: "data/raw"
+  processed_path: "data/processed"
+  output_path: "data/output"
 
 # Mapeamento de tabelas e parâmetros dos pipelines
 pipelines:
   sales:
+    batch_size: 50000
+    source_table: "tb_pedidos"
+    target_table: "dim_vendas"
+    write_mode: "append" # append | replace | upsert
     # Parâmetros do pipeline de vendas
   hr:
+    source_file: "data/raw/funcionarios.csv"
+    target_table: "dim_colaboradores"
+
     # Parâmetros do pipeline de RH

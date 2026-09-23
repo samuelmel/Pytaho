@@ -1,0 +1,25 @@
+import ast
+from pathlib import Path
+from pytaho.parser.ktr_parser import KTRParser
+from pytaho.generator.code_builder import PythonCodeBuilder
+
+def test_generate_python_code_from_ktr():
+    sample_file = Path("sample_pentaho_files/exemplo_oracle.ktr")
+    parser = KTRParser(sample_file)
+    trans = parser.parse()
+
+    builder = PythonCodeBuilder(trans)
+    python_code = builder.build_python_script()
+
+    # Validação de Sintaxe do código gerado usando AST
+    parsed_ast = ast.parse(python_code)
+    assert parsed_ast is not None
+
+    # Verificações de presença de elementos
+    assert "class OracleDatabaseConnection:" in python_code
+    assert "class ExtrairVendasOracleExtractor:" in python_code
+    assert "class TratarCamposVendaTransformer:" in python_code
+    assert "class CarregarDWOracleLoader:" in python_code
+    assert "class etl_vendas_oraclePipeline:" in python_code
+    assert "oracledb" in python_code
+

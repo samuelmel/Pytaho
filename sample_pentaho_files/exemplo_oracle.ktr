@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<transformation>
+  <info>
+    <name>etl_vendas_oracle</name>
+    <description>Pipeline de carga de vendas a partir de Banco de Dados Oracle</description>
+    <extended_description/>
+    <trans_version/>
+    <trans_type>Normal</trans_type>
+  </info>
+  <connection>
+    <name>OracleDW</name>
+    <server>10.0.0.50</server>
+    <type>ORACLE</type>
+    <access>Native</access>
+    <database>ORCLDW</database>
+    <port>1521</port>
+    <username>usr_etl</username>
+    <password>SecretOraclePass123</password>
+    <attributes>
+      <attribute><code>PORT_NUMBER</code><attribute>1521</attribute></attribute>
+    </attributes>
+  </connection>
+  <order>
+    <hop>
+      <from>Extrair Vendas Oracle</from>
+      <to>Tratar Campos Venda</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>Tratar Campos Venda</from>
+      <to>Carregar DW Oracle</to>
+      <enabled>Y</enabled>
+    </hop>
+  </order>
+  <step>
+    <name>Extrair Vendas Oracle</name>
+    <type>TableInput</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <connection>OracleDW</connection>
+    <sql>SELECT id_venda, cd_cliente, vl_total, dt_venda FROM tb_vendas WHERE status = 'APROVADO'</sql>
+    <limit>0</limit>
+  </step>
+  <step>
+    <name>Tratar Campos Venda</name>
+    <type>SelectValues</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <fields>
+      <field>
+        <name>id_venda</name>
+        <rename>venda_id</rename>
+      </field>
+      <field>
+        <name>cd_cliente</name>
+        <rename>cliente_id</rename>
+      </field>
+    </fields>
+  </step>
+  <step>
+    <name>Carregar DW Oracle</name>
+    <type>TableOutput</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <connection>OracleDW</connection>
+    <schema>DW_VENDAS</schema>
+    <table>fact_vendas</table>
+    <commit>5000</commit>
+  </step>
+</transformation>
+
