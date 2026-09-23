@@ -1,13 +1,24 @@
-# Pytaho - Pentaho XML to Python OOP Transpiler 🚀
+````markdown
+<div align="center">
 
-O **Pytaho** é uma ferramenta open-source de **transpilação e geração automática de código Python Orientado a Objetos (POO)** a partir de transformações (`.ktr`) e jobs (`.kjb`) exportados do **Pentaho Data Integration (PDI / Kettle)**.
+# 🚀 Pytaho
+### *Pentaho XML (`.ktr` / `.kjb`) to Modern Python OOP Transpiler*
+
+[![Python](https://img.shields.io/badge/Python-3.10%2B-blue.svg)](https://www.python.org/)
+[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
+[![Engine: Polars](https://img.shields.io/badge/Data%20Engine-Polars-CD7F32.svg)](https://pola.rs/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+
+**Migre seus pipelines legados do Pentaho Data Integration (PDI) para código Python modular, performático e legível em segundos.**
+
+</div>
 
 ---
 
 ## 🌟 Principais Funcionalidades
 
 1. **Parser de Arquivos Pentaho XML (`.ktr` / `.kjb`)**:
-   - Lê e analisa a estrutura de transformações, extraindo conexões de banco de dados (`<connection>`), passos (`<step>`), fluxo de dados (`<order>` / hops) e variáveis.
+   - Lê e analisa a estrutura de transformações e jobs, extraindo conexões de banco de dados (`<connection>`), passos (`<step>`), fluxo de dados (`<order>` / hops) e variáveis.
 
 2. **Auto-Detecção de Banco de Dados & Dialetos**:
    - Identifica automaticamente o banco de dados configurado no Pentaho (ex: `ORACLE`, `POSTGRESQL`, `MSSQL`, `MYSQL`).
@@ -16,69 +27,41 @@ O **Pytaho** é uma ferramenta open-source de **transpilação e geração autom
 3. **Geração de Código Python com Orientação a Objetos (POO)**:
    - Traduz os passos do Pentaho em classes desacopladas, legíveis e modulares:
      - **Conexões**: Classes gerenciadoras de sessão (ex: `OracleDatabaseConnection`).
-     - **Input Steps**: Classes Extratoras (ex: `ExtrairVendasOracleExtractor`).
-     - **Transform Steps**: Classes Transformadoras (ex: `TratarCamposVendaTransformer`).
-     - **Output Steps**: Classes Carregadoras (ex: `CarregarDWOracleLoader`).
-     - **Pipeline Orchestrator**: Classe orquestradora principal (ex: `etl_vendas_oraclePipeline`).
+     - **Input Steps**: Classes Extratoras (ex: `ExtrairVendasExtractor`).
+     - **Transform Steps**: Classes Transformadoras (ex: `TratarCamposTransformer`).
+     - **Output Steps**: Classes Carregadoras (ex: `CarregarDWLoader`).
+     - **Pipeline Orchestrator**: Classe orquestradora principal (ex: `PipelineVendas`).
    - Utiliza o motor analítico **Polars** no código gerado para processamento de alta performance em memória.
 
 4. **Interface de Linha de Comando (CLI)**:
    - Transpile seus arquivos do Pentaho em segundos através do terminal:
-     ```bash
-     pytaho convert sample_pentaho_files/exemplo_oracle.ktr --output pipelines/script_vendas.py
-     ```
+
+```bash
+pytaho convert sample_pentaho_files/exemplo_oracle.ktr -o pipelines/vendas_oracle.py
+````
 
 ---
 
-## 📁 Estrutura do Projeto
+## 📌 Por que usar o Pytaho?
 
-```plaintext
-pytaho/
-├── .env.example                # Template de variáveis de ambiente
-├── .gitignore                  # Regras para ignorar .env, logs e venv
-├── pyproject.toml              # Empacotamento e dependências (uv / pip)
-├── requirements.txt            # Lista de dependências do transpilador
-├── README.md                   # Documentação oficial
-│
-├── src/
-│   └── pytaho/
-│       ├── __init__.py
-│       ├── cli.py              # Interface CLI (pytaho convert ...)
-│       │
-│       ├── parser/             # Leitura do XML do Pentaho
-│       │   ├── models.py       # Dataclasses/Pydantic que representam o AST
-│       │   ├── ktr_parser.py   # Parser de Transformações (.ktr)
-│       │   └── kjb_parser.py   # Parser de Jobs (.kjb)
-│       │
-│       ├── dialects/           # Adaptadores por Banco de Dados (Auto-Detecção)
-│       │   ├── base_dialect.py # Interface abstrata dos dialetos
-│       │   ├── oracle.py       # Conector e adaptadores para Oracle (oracledb)
-│       │   ├── postgresql.py   # Conector para PostgreSQL (psycopg3)
-│       │   ├── mssql.py        # Conector para SQL Server (pyodbc)
-│       │   └── mysql.py        # Conector para MySQL (pymysql)
-│       │
-│       └── generator/          # Gerador de código Python POO
-│           ├── step_mappers.py # Mapeia Steps Pentaho -> Classes POO
-│           └── code_builder.py # Monta o script Python final
-│
-├── sample_pentaho_files/       # XMLs de exemplo para testes de conversão
-│   └── exemplo_oracle.ktr
-│
-└── tests/                      # Testes automatizados do transpilador
-    ├── test_ktr_parser.py
-    ├── test_oracle_dialect.py
-    └── test_code_generator.py
-```
+* **Zero Lock-in:** Abandone interfaces gráficas pesadas e execute seus pipelines nativamente em containers Docker, Airflow ou GitHub Actions.
+* **Alta Performance:** Substitua o processamento Java do Pentaho pela velocidade nativa do motor em Rust do **Polars**.
+* **Código Limpo & POO:** Geração de classes totalmente desacopladas (Extractors, Transformers, Loaders) com tipagem estática.
+* **Segurança Nativa:** Variáveis de conexão e segredos são parametrizados automaticamente para variáveis de ambiente (`.env`).
 
 ---
 
-## 🚀 Como Usar
+## ⚡ Quickstart
 
 ### 1. Instalação das Dependências
 
-Utilizando [`uv`](https://github.com/astral-sh/uv) (rápido) ou `pip`:
+Recomendamos o uso do [`uv`](https://github.com/astral-sh/uv) pela velocidade, mas você pode utilizar o `pip` tradicional:
 
 ```bash
+# Clone o repositório
+git clone https://github.com/seu-usuario/pytaho.git
+cd pytaho
+
 # Usando uv:
 uv venv
 source .venv/bin/activate  # No Windows: .venv\Scripts\activate
@@ -100,87 +83,122 @@ python -m pytaho.cli convert sample_pentaho_files/exemplo_oracle.ktr -o pipeline
 
 ---
 
-## ⚡ Exemplo de Código Gerado (Output POO)
+## 💻 Exemplo de Código Gerado (Output POO)
 
-Ao transpilar um `.ktr` com banco **Oracle**, o Pytaho gera automaticamente um código estruturado em POO como este:
+Ao transpilar um `.ktr` com banco **Oracle**, o Pytaho gera automaticamente um script estruturado em POO, totalmente seguro e legível:
 
 ```python
 import os
 import logging
 import polars as pl
 from dotenv import load_dotenv
+from sqlalchemy import create_engine
 
 load_dotenv()
 logger = logging.getLogger("pytaho_pipeline")
 
-class OracleDatabaseConnection:
-    """Gerenciador de conexão com Banco de Dados Oracle usando oracledb em Thin Mode."""
-    def __init__(self, host: str = "10.0.0.50", port: str = "1521", service_name: str = "ORCLDW", user: str = "usr_etl", password: str = "SecretOraclePass123"):
-        self.host = host
-        self.port = port
-        self.service_name = service_name
-        self.user = user
-        self.password = password
 
-    def get_sqlalchemy_engine(self):
-        from sqlalchemy import create_engine
-        url = f"oracle+oracledb://{self.user}:{self.password}@{self.host}:{self.port}/?service_name={self.service_name}"
+class OracleDatabaseConnection:
+    """Gerenciador de conexão Oracle desacoplado (oracledb Thin Mode)."""
+    
+    def __init__(self):
+        self.host = os.getenv("ORACLE_HOST", "localhost")
+        self.port = os.getenv("ORACLE_PORT", "1521")
+        self.service = os.getenv("ORACLE_SERVICE", "ORCL")
+        self.user = os.getenv("ORACLE_USER")
+        self.password = os.getenv("ORACLE_PASSWORD")
+
+    def get_engine(self):
+        url = f"oracle+oracledb://{self.user}:{self.password}@{self.host}:{self.port}/?service_name={self.service}"
         return create_engine(url, pool_pre_ping=True)
 
-class ExtrairVendasOracleExtractor:
-    """Extrator de dados gerado a partir do step Pentaho: 'Extrair Vendas Oracle'"""
-    def __init__(self, db_connection):
-        self.db_connection = db_connection
-        self.query = """SELECT id_venda, cd_cliente, vl_total, dt_venda FROM tb_vendas WHERE status = 'APROVADO'"""
+
+class ExtrairVendasExtractor:
+    """Extração de dados gerada a partir do step Pentaho: 'Extrair Vendas Oracle'"""
+    
+    def __init__(self, db_conn: OracleDatabaseConnection):
+        self.db = db_conn
+        self.query = "SELECT id_venda, cd_cliente, vl_total FROM tb_vendas WHERE status = 'APROVADO'"
 
     def extract(self) -> pl.DataFrame:
-        logger.info("Executando extração...")
-        engine = self.db_connection.get_sqlalchemy_engine()
-        return pl.read_database(query=self.query, connection=engine)
+        logger.info("Iniciando extração na base Oracle...")
+        return pl.read_database(query=self.query, connection=self.db.get_engine())
 
-class TratarCamposVendaTransformer:
-    """Transformador de dados gerado a partir do step Pentaho: 'Tratar Campos Venda'"""
-    def __init__(self):
-        self.rename_mapping = {'id_venda': 'venda_id', 'cd_cliente': 'cliente_id'}
 
+class TratarCamposTransformer:
+    """Transformação de dados gerada a partir do step Pentaho: 'Tratar Campos Venda'"""
+    
     def transform(self, df: pl.DataFrame) -> pl.DataFrame:
-        if self.rename_mapping:
-            df = df.rename({k: v for k, v in self.rename_mapping.items() if k in df.columns})
-        return df
+        logger.info("Aplicando transformações nos dados...")
+        return df.rename({"id_venda": "venda_id", "cd_cliente": "cliente_id"})
 
-class CarregarDWOracleLoader:
-    """Carregador de dados gerado a partir do step Pentaho: 'Carregar DW Oracle'"""
-    def __init__(self, db_connection):
-        self.db_connection = db_connection
-        self.table_name = "fact_vendas"
+
+class CarregarDWLoader:
+    """Carga de dados gerada a partir do step Pentaho: 'Carregar DW Oracle'"""
+    
+    def __init__(self, db_conn: OracleDatabaseConnection):
+        self.db = db_conn
+        self.target_table = "fact_vendas"
 
     def load(self, df: pl.DataFrame) -> int:
-        engine = self.db_connection.get_sqlalchemy_engine()
-        df.write_database(table_name=self.table_name, connection=engine, if_table_exists="append")
+        logger.info(f"Carregando {len(df)} registros na tabela {self.target_table}...")
+        df.write_database(
+            table_name=self.target_table,
+            connection=self.db.get_engine(),
+            if_table_exists="append"
+        )
         return len(df)
 
-class etl_vendas_oraclePipeline:
-    """Pipeline Principal POO"""
+
+class PipelineVendas:
+    """Orquestrador do Fluxo de Dados (DAG)."""
+    
     def __init__(self):
-        self.db_oracledw = OracleDatabaseConnection()
-        self.extractor_0 = ExtrairVendasOracleExtractor(self.db_oracledw)
-        self.transformer_1 = TratarCamposVendaTransformer()
-        self.loader_2 = CarregarDWOracleLoader(self.db_oracledw)
+        self.db = OracleDatabaseConnection()
+        self.extractor = ExtrairVendasExtractor(self.db)
+        self.transformer = TratarCamposTransformer()
+        self.loader = CarregarDWLoader(self.db)
 
     def run(self):
-        df_0 = self.extractor_0.extract()
-        df_1 = self.transformer_1.transform(df_0)
-        self.loader_2.load(df_1)
+        logger.info("Iniciando execução do pipeline...")
+        df_raw = self.extractor.extract()
+        df_clean = self.transformer.transform(df_raw)
+        rows_inserted = self.loader.load(df_clean)
+        logger.info(f"Pipeline finalizado com sucesso. Registros inseridos: {rows_inserted}")
+
 
 if __name__ == "__main__":
-    pipeline = etl_vendas_oraclePipeline()
+    logging.basicConfig(level=logging.INFO)
+    pipeline = PipelineVendas()
     pipeline.run()
 ```
 
 ---
 
-## 🧪 Executar Testes Automatizados
+## 🛠️ Conectores & Dialetos Suportados
+
+| Banco de Dados | Driver Python Nativo   | Suporte no Pytaho |
+| -------------- | ---------------------- | ----------------- |
+| **Oracle**     | `oracledb` (Thin Mode) | ✅ Nativo          |
+| **PostgreSQL** | `psycopg3`             | ✅ Nativo          |
+| **SQL Server** | `pyodbc` / `pymssql`   | ✅ Nativo          |
+| **MySQL**      | `pymysql`              | ✅ Nativo          |
+
+---
+
+## 🧪 Executando os Testes Automatizados
+
+Para validar o parser XML, a detecção de dialetos e a sintaxe do código gerado:
 
 ```bash
-pytest
+pytest -v
+```
+
+---
+
+## 📄 Licença
+
+Este projeto está sob a licença MIT. Veja o arquivo [LICENSE](LICENSE) para mais detalhes.
+
+```
 ```
