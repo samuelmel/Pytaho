@@ -35,7 +35,6 @@ class StepCodeMapper:
         import polars as pl
         logger.info("Executando extração do step '{step.name}'...")
         engine = self.db_connection.get_sqlalchemy_engine()
-        # Lê a consulta diretamente para um DataFrame Polars
         return pl.read_database(query=self.query, connection=engine)
 '''
 
@@ -65,6 +64,29 @@ class StepCodeMapper:
 '''
 
     @staticmethod
+    def generate_joiner_class(step: PentahoStep) -> str:
+        """Gera classe POO de Junção / Join (ex: para StreamLookup, MergeJoin)."""
+        class_name = f"{step.name.replace(' ', '')}Joiner"
+        join_key = "id_cliente"
+        if step.fields and len(step.fields) > 0 and step.fields[0].get("name"):
+            join_key = step.fields[0]["name"]
+
+        return f'''class {class_name}:
+    """
+    Unificador/Joiner de dados gerado a partir do step Pentaho: '{step.name}' (Tipo: {step.type})
+    Realiza o cruzamento (Join) em memória entre DataFrames.
+    """
+    def __init__(self, join_key: str = "{join_key}", how: str = "inner"):
+        self.join_key = join_key
+        self.how = how
+
+    def join(self, df_left: "pl.DataFrame", df_right: "pl.DataFrame") -> "pl.DataFrame":
+        import polars as pl
+        logger.info(f"Executando Join entre DataFrames pela chave '{{self.join_key}}'...")
+        return df_left.join(df_right, on=self.join_key, how=self.how)
+'''
+
+    @staticmethod
     def generate_loader_class(step: PentahoStep, transformation: PentahoTransformation) -> str:
         """Gera classe POO Carregadora (ex: para TableOutput)."""
         class_name = f"{step.name.replace(' ', '')}Loader"
@@ -90,4 +112,3 @@ class StepCodeMapper:
         df.write_database(table_name=self.table_name, connection=engine, if_table_exists="append")
         return len(df)
 '''
-

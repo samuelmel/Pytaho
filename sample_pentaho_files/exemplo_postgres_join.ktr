@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<transformation>
+  <info>
+    <name>etl_vendas_clientes_postgres</name>
+    <description>Consulta a tabela de clientes e a tabela de pedidos no PostgreSQL, unifica (Join) os resultados em memória e carrega na tabela consolidada do Data Warehouse</description>
+    <extended_description/>
+    <trans_version/>
+    <trans_type>Normal</trans_type>
+  </info>
+  <connection>
+    <name>PostgresComercialDB</name>
+    <server>localhost</server>
+    <type>POSTGRESQL</type>
+    <access>Native</access>
+    <database>db_comercial</database>
+    <port>5432</port>
+    <username>postgres</username>
+    <password>secret_postgres_pass</password>
+  </connection>
+  <order>
+    <hop>
+      <from>Extrair Clientes Ativos</from>
+      <to>Juntar Clientes e Pedidos</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>Extrair Pedidos Recentes</from>
+      <to>Juntar Clientes e Pedidos</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>Juntar Clientes e Pedidos</from>
+      <to>Carregar DW Pedidos Consolidados</to>
+      <enabled>Y</enabled>
+    </hop>
+  </order>
+  <step>
+    <name>Extrair Clientes Ativos</name>
+    <type>TableInput</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <connection>PostgresComercialDB</connection>
+    <sql>SELECT id_cliente, nm_cliente, ds_email, sg_uf FROM tb_clientes WHERE status = 'A'</sql>
+    <limit>0</limit>
+  </step>
+  <step>
+    <name>Extrair Pedidos Recentes</name>
+    <type>TableInput</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <connection>PostgresComercialDB</connection>
+    <sql>SELECT id_pedido, id_cliente, vl_total, dt_pedido FROM tb_pedidos WHERE dt_pedido &gt;= CURRENT_DATE - INTERVAL '30 days'</sql>
+    <limit>0</limit>
+  </step>
+  <step>
+    <name>Juntar Clientes e Pedidos</name>
+    <type>StreamLookup</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <fields>
+      <field>
+        <name>id_cliente</name>
+      </field>
+    </fields>
+  </step>
+  <step>
+    <name>Carregar DW Pedidos Consolidados</name>
+    <type>TableOutput</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <connection>PostgresComercialDB</connection>
+    <schema>dw</schema>
+    <table>fact_pedidos_consolidados</table>
+    <commit>1000</commit>
+  </step>
+</transformation>
+

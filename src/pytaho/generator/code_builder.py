@@ -8,7 +8,7 @@ class PythonCodeBuilder:
     """
     Construtor principal de Código Python POO a partir da AST do Pentaho.
     Gerencia imports, conexões de banco (auto-detectando Oracle, Postgres, etc.),
-    classes POO de extratores, transformadores, carregadores e a pipeline orquestradora.
+    classes POO de extratores, transformadores, joiners, carregadores e a pipeline orquestradora.
     """
 
     def __init__(self, transformation: PentahoTransformation):
@@ -17,22 +17,11 @@ class PythonCodeBuilder:
     def build_python_script(self) -> str:
         """Gera o script Python POO completo em formato de texto."""
         sections = []
-
-        # 1. Cabeçalho e Imports
         sections.append(self._build_header())
-
-        # 2. Clientes de Conexão de Banco de Dados (Auto-detectados)
         sections.append(self._build_database_connections())
-
-        # 3. Classes de Extração, Transformação e Carga (POO)
         sections.append(self._build_step_classes())
-
-        # 4. Classe Pipeline Principal (Orquestradora POO)
         sections.append(self._build_pipeline_runner())
-
-        # 5. Ponto de Entrada (__main__)
         sections.append(self._build_main_block())
-
         return "\n\n".join(sections)
 
     def write_to_file(self, output_path: Union[str, Path]) -> Path:
@@ -81,6 +70,8 @@ logger = logging.getLogger("pytaho_pipeline")'''
                 code_blocks.append(StepCodeMapper.generate_extractor_class(step, self.transformation))
             elif "tableoutput" in stype or "output" in stype:
                 code_blocks.append(StepCodeMapper.generate_loader_class(step, self.transformation))
+            elif "lookup" in stype or "join" in stype or "merge" in stype:
+                code_blocks.append(StepCodeMapper.generate_joiner_class(step))
             else:
                 code_blocks.append(StepCodeMapper.generate_transformer_class(step))
         return "\n\n".join(code_blocks)
@@ -94,12 +85,16 @@ logger = logging.getLogger("pytaho_pipeline")'''
                 conn_inits.append(f"        self.{var_name} = OracleDatabaseConnection()")
             elif adapter.db_type_name == "PostgreSQL":
                 conn_inits.append(f"        self.{var_name} = PostgresDatabaseConnection()")
+            elif adapter.db_type_name == "SQL Server":
+                conn_inits.append(f"        self.{var_name} = MSSQLDatabaseConnection()")
+            elif adapter.db_type_name == "MySQL":
+                conn_inits.append(f"        self.{var_name} = MySQLDatabaseConnection()")
             else:
                 conn_inits.append(f"        self.{var_name} = PostgresDatabaseConnection()")
 
         step_inits = []
         step_execs = []
-        last_df_var = "df_raw"
+        extracted_dfs = []
 
         for idx, step in enumerate(self.transformation.steps):
             stype = step.type.lower()
@@ -108,15 +103,28 @@ logger = logging.getLogger("pytaho_pipeline")'''
 
             if "input" in stype:
                 step_inits.append(f"        self.extractor_{idx} = {class_base}Extractor({var_conn})")
-                step_execs.append(f"        df_{idx} = self.extractor_{idx}.extract()")
-                last_df_var = f"df_{idx}"
+                df_var = f"df_extracted_{len(extracted_dfs)}"
+                step_execs.append(f"        {df_var} = self.extractor_{idx}.extract()")
+                extracted_dfs.append(df_var)
+
+            elif "lookup" in stype or "join" in stype or "merge" in stype:
+                step_inits.append(f"        self.joiner_{idx} = {class_base}Joiner()")
+                if len(extracted_dfs) >= 2:
+                    step_execs.append(f"        df_joined = self.joiner_{idx}.join({extracted_dfs[0]}, {extracted_dfs[1]})")
+                elif len(extracted_dfs) == 1:
+                    step_execs.append(f"        df_joined = self.joiner_{idx}.join({extracted_dfs[0]}, {extracted_dfs[0]})")
+                else:
+                    step_execs.append(f"        df_joined = self.joiner_{idx}.join(df_left, df_right)")
+
             elif "output" in stype:
                 step_inits.append(f"        self.loader_{idx} = {class_base}Loader({var_conn})")
-                step_execs.append(f"        rows_loaded = self.loader_{idx}.load({last_df_var})")
+                load_src = "df_joined" if "df_joined" in "\n".join(step_execs) else (extracted_dfs[-1] if extracted_dfs else "df_data")
+                step_execs.append(f"        rows_loaded = self.loader_{idx}.load({load_src})")
+
             else:
                 step_inits.append(f"        self.transformer_{idx} = {class_base}Transformer()")
-                step_execs.append(f"        df_{idx} = self.transformer_{idx}.transform({last_df_var})")
-                last_df_var = f"df_{idx}"
+                trans_src = "df_joined" if "df_joined" in "\n".join(step_execs) else (extracted_dfs[-1] if extracted_dfs else "df_data")
+                step_execs.append(f"        df_transformed = self.transformer_{idx}.transform({trans_src})")
 
         inits_str = "\n".join(conn_inits + step_inits) if (conn_inits or step_inits) else "        pass"
         execs_str = "\n".join(step_execs) if step_execs else "        pass"
@@ -124,7 +132,7 @@ logger = logging.getLogger("pytaho_pipeline")'''
         return f'''class {self.transformation.name.replace(" ", "")}Pipeline:
     """
     Pipeline Principal POO responsável por orquestrar a execução do fluxo:
-    Extract -> Transform -> Load
+    Extract -> Transform / Join -> Load
     """
     def __init__(self):
 {inits_str}
@@ -139,4 +147,3 @@ logger = logging.getLogger("pytaho_pipeline")'''
         return f'''if __name__ == "__main__":
     pipeline = {pipeline_class}()
     pipeline.run()'''
-
